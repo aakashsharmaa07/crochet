@@ -1157,16 +1157,22 @@ img {
   color: var(--ruby-velvet);
 }
 
+/* Body Lock when Cart is Open */
+body.cart-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
 /* Slide-Over Cart Drawer & Premium Red Trash Bin SVG Button */
 .cart-drawer-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background: rgba(31, 29, 29, 0.45);
   backdrop-filter: blur(5px);
-  z-index: 1000;
+  z-index: 9999;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
@@ -1183,13 +1189,15 @@ img {
   right: -450px;
   width: 100%;
   max-width: 420px;
-  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   background: var(--porcelain-white);
-  z-index: 1001;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   box-shadow: -10px 0 40px rgba(0,0,0,0.18);
   transition: right 0.4s var(--smooth-easing);
+  overflow: hidden !important;
 }
 
 .cart-drawer.active {
@@ -1203,6 +1211,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .drawer-header h3 {
@@ -1212,8 +1221,9 @@ img {
 }
 
 .drawer-body {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 22px 26px;
 }
 
@@ -1305,9 +1315,14 @@ img {
 }
 
 .drawer-footer {
-  padding: 22px 26px;
+  padding: 20px 26px calc(20px + env(safe-area-inset-bottom));
   background: var(--white);
   border-top: 1px solid var(--sandstone-border);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.06);
 }
 
 .subtotal-row {
@@ -1857,14 +1872,46 @@ textarea.form-control {
     gap: 24px !important;
   }
 
-  /* 7. MOTIFS OPTIMIZATION ON MOBILE */
-  .crochet-motif {
-    opacity: 0.35 !important;
-    transform: scale(0.8) !important;
+  /* 7. MOTIFS TARGETED FOR MOBILE (Hero Motifs Stay Visible on Mobile, Lower Section Motifs Hidden) */
+  .shop-section .crochet-motif,
+  .story-section .crochet-motif,
+  .testimonials-section .crochet-motif {
+    display: none !important;
+  }
+
+  .hero-section .crochet-motif {
+    display: block !important;
+    opacity: 0.45 !important;
+    transform: scale(0.75) !important;
   }
 
   .nav-links {
     display: none !important;
+  }
+
+  /* 8. MOBILE CART DRAWER & LOCKED STICKY FOOTER */
+  .cart-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    right: -100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    top: 0 !important;
+    bottom: 0 !important;
+  }
+
+  .cart-drawer.active {
+    right: 0 !important;
+  }
+
+  .drawer-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    flex-shrink: 0 !important;
+    padding: 16px 20px calc(16px + env(safe-area-inset-bottom)) !important;
+    background: var(--white) !important;
+    z-index: 20 !important;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08) !important;
   }
 
   /* Footer Mobile Grid */

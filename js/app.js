@@ -413,11 +413,13 @@ window.toggleCartDrawer = function(open = true) {
   const drawer = document.getElementById('cartDrawer');
   if (open) {
     cartStore.renderCartDrawer();
-    overlay.classList.add('active');
-    drawer.classList.add('active');
+    if (overlay) overlay.classList.add('active');
+    if (drawer) drawer.classList.add('active');
+    document.body.classList.add('cart-open');
   } else {
-    overlay.classList.remove('active');
-    drawer.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    if (drawer) drawer.classList.remove('active');
+    document.body.classList.remove('cart-open');
   }
 };
 
