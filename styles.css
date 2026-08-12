@@ -1872,17 +1872,35 @@ textarea.form-control {
     gap: 24px !important;
   }
 
-  /* 7. MOTIFS TARGETED FOR MOBILE (Hero Motifs Stay Visible on Mobile, Lower Section Motifs Hidden) */
+  /* 7. TARGETED MOBILE MOTIFS (Exact Image 1 & Image 2 Customizations) */
+  /* Lower section motifs hidden on mobile */
   .shop-section .crochet-motif,
   .story-section .crochet-motif,
   .testimonials-section .crochet-motif {
     display: none !important;
   }
 
-  .hero-section .crochet-motif {
+  /* Image 1: Remove the 3 header text-overlapping motifs (ribbon, heart, flower) */
+  .hero-section .motif-bow1,
+  .hero-section .motif-heart1,
+  .hero-section .motif-flower1 {
+    display: none !important;
+  }
+
+  /* Image 2: Completely remove the 2 hero card motifs (star, hook) */
+  .hero-section .motif-star1,
+  .hero-section .motif-hook1 {
+    display: none !important;
+  }
+
+  /* Top-right yarn motif stays neatly in the right empty space */
+  .hero-section .motif-yarn1 {
     display: block !important;
-    opacity: 0.45 !important;
-    transform: scale(0.75) !important;
+    top: 24px !important;
+    right: 6% !important;
+    left: auto !important;
+    opacity: 0.5 !important;
+    transform: scale(0.8) !important;
   }
 
   .nav-links {

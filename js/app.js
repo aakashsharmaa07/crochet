@@ -541,7 +541,7 @@ window.renderFullPageCheckout = function() {
           <!-- Row 2: Phone & Email -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
-              <label>WhatsApp Phone Number *</label>
+              <label>WhatsApp Number *</label>
               <input type="tel" id="fullCustPhone" class="form-control" placeholder="9355415171" value="9355415171" required />
             </div>
             <div class="form-group">
