@@ -1,7 +1,7 @@
 /* ==========================================================================
    Cozy Loops Crochet - Custom Design System & Ultra-Smooth Aesthetics
    Color Palette: Porcelain White, Sandstone, Ruby Velvet, Onyx Black
-   Handcrafted Crochet Motifs, Scalloped Knitted Borders & Micro-Animations
+   Soft Dual-Edge Feather Blended Sections
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
@@ -571,22 +571,55 @@ img {
   color: var(--text-muted);
 }
 
-/* Compact Section Padding & Headers */
+/* ==========================================================================
+   SOFT DUAL-EDGE FEATHER BLENDED SECTIONS (ZERO HARSH LINES / HARD BORDERS)
+   ========================================================================== */
+
 .shop-section {
-  padding: 28px 0;
+  padding: 32px 0;
   position: relative;
+  background: transparent;
+  border: none;
 }
 
+/* Bestsellers Section Soft Feather Fade Top & Bottom */
 .bestsellers-section {
-  background: rgba(255, 255, 255, 0.7);
-  border-y: 2px dashed var(--sandstone-border);
+  padding: 36px 0;
   position: relative;
+  border: none;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.75) 15%, 
+    rgba(255, 255, 255, 0.75) 85%, 
+    transparent 100%
+  );
 }
 
+/* Custom Gifts Section Soft Feather Fade Top & Bottom */
 .custom-gifts-section {
-  background: var(--sandstone-light);
-  border-y: 2px dashed var(--sandstone-border);
+  padding: 36px 0;
   position: relative;
+  border: none;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(247, 241, 232, 0.85) 15%, 
+    rgba(247, 241, 232, 0.85) 85%, 
+    transparent 100%
+  );
+}
+
+/* Craft Story Section Soft Feather Fade */
+.story-section {
+  padding: 44px 0;
+  position: relative;
+  border: none;
+  margin: 16px 0;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.8) 20%, 
+    rgba(255, 255, 255, 0.8) 80%, 
+    transparent 100%
+  );
 }
 
 .section-header {
@@ -981,15 +1014,6 @@ img {
   border-top: 1px solid var(--sandstone-border);
   padding-top: 16px;
   font-size: 0.88rem;
-}
-
-/* Craft Story Section */
-.story-section {
-  padding: 48px 0;
-  background: var(--white);
-  border-y: 2px dashed var(--sandstone-border);
-  margin: 28px 0;
-  position: relative;
 }
 
 .story-grid {
