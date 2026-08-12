@@ -178,16 +178,7 @@ class CartStore {
   }
 
   toggleWishlist(productId) {
-    const idx = this.wishlist.indexOf(productId);
-    if (idx > -1) {
-      this.wishlist.splice(idx, 1);
-    } else {
-      this.wishlist.push(productId);
-    }
-    this.saveWishlist();
-    if (window.updateWishlistUI) {
-      window.updateWishlistUI(productId);
-    }
+    // Wishlist completely removed
   }
 
   updateCartBadge() {

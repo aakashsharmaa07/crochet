@@ -271,7 +271,6 @@ function renderCustomGiftsGrid() {
 
 // Helper to generate Card HTML
 function createProductCardHtml(p, prefix = '') {
-  const isWishlisted = cartStore.wishlist.includes(p.id);
   const inCartQty = cartStore.getProductTotalQuantity(p.id);
   const colorDots = (p.colors || []).map(c => `<span class="color-dot" title="${c}" style="background: ${getColorHex(c)};"></span>`).join('');
 
@@ -295,9 +294,6 @@ function createProductCardHtml(p, prefix = '') {
       <div class="card-img-wrapper" onclick="openQuickView('${p.id}')" style="cursor: pointer;">
         <img src="${p.image}" alt="${p.name}" class="card-img" />
         ${p.badge ? `<span class="card-badge">${p.badge}</span>` : ''}
-        <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" id="wishlist-btn-${prefix}${p.id}" onclick="event.stopPropagation(); cartStore.toggleWishlist('${p.id}')" title="Save to Wishlist">
-          ${isWishlisted ? '❤️' : '🤍'}
-        </button>
       </div>
       <div class="product-meta">
         <span>${p.category}</span>

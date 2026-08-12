@@ -63,7 +63,7 @@ body {
 
 a {
   color: inherit;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 button {
@@ -71,6 +71,7 @@ button {
   border: none;
   background: none;
   font-family: inherit;
+  text-decoration: none !important;
 }
 
 img {
@@ -166,10 +167,12 @@ img {
   font-weight: 700;
   color: var(--ruby-velvet);
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .brand-logo:hover {
   transform: scale(1.03);
+  text-decoration: none !important;
 }
 
 .brand-logo .logo-icon {
@@ -199,6 +202,7 @@ img {
   position: relative;
   transition: var(--transition);
   padding: 4px 0;
+  text-decoration: none !important;
 }
 
 .nav-links a::after {
@@ -222,6 +226,7 @@ img {
 .nav-links a:hover,
 .nav-links a.active {
   color: var(--ruby-velvet);
+  text-decoration: none !important;
 }
 
 .nav-actions {
@@ -304,6 +309,7 @@ img {
   color: var(--ruby-velvet);
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
+  text-decoration: none !important;
 }
 
 .btn-icon svg {
@@ -354,12 +360,14 @@ img {
   box-shadow: 0 8px 20px rgba(125, 37, 58, 0.25);
   transition: var(--transition);
   border: 1px dashed rgba(255,255,255,0.4);
+  text-decoration: none !important;
 }
 
 .btn-primary:hover {
   background: var(--ruby-velvet-hover);
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 12px 28px rgba(125, 37, 58, 0.35);
+  text-decoration: none !important;
 }
 
 .btn-secondary {
@@ -375,6 +383,7 @@ img {
   gap: 8px;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
+  text-decoration: none !important;
 }
 
 .btn-secondary:hover {
@@ -382,6 +391,7 @@ img {
   border-color: var(--sandstone);
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
+  text-decoration: none !important;
 }
 
 /* Full Page Views */
@@ -675,6 +685,7 @@ img {
   white-space: nowrap;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: none;
+  text-decoration: none !important;
 }
 
 .pill-btn:hover {
@@ -682,21 +693,24 @@ img {
   border-color: var(--ruby-velvet);
   color: var(--ruby-velvet);
   transform: translateY(-2px);
+  text-decoration: none !important;
 }
 
+/* SOFT ELEGANT ACTIVE CATEGORY PILL SHADOW */
 .pill-btn.active {
   background: var(--ruby-velvet);
   color: var(--white);
   border: 1.5px solid var(--ruby-velvet);
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(125, 37, 58, 0.24);
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(125, 37, 58, 0.16) !important;
   animation: pillSwitch 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration: none !important;
 }
 
 @keyframes pillSwitch {
-  0% { transform: scale(0.94); }
-  60% { transform: scale(1.08); }
-  100% { transform: scale(1.05); }
+  0% { transform: scale(0.96); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1.03); }
 }
 
 /* Products Grid (DESKTOP DEFAULT: Multi-Column Grid) */
@@ -722,6 +736,7 @@ img {
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
+  text-decoration: none !important;
 }
 
 .product-card:hover {
@@ -729,6 +744,7 @@ img {
   box-shadow: var(--shadow-md);
   border-style: solid;
   border-color: var(--ruby-velvet);
+  text-decoration: none !important;
 }
 
 .card-img-wrapper {
@@ -765,31 +781,6 @@ img {
   border: 1px dashed rgba(255,255,255,0.4);
 }
 
-.wishlist-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(4px);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 1.05rem;
-  transition: var(--transition);
-  box-shadow: var(--shadow-sm);
-}
-
-.wishlist-btn:hover,
-.wishlist-btn.active {
-  color: var(--ruby-velvet);
-  background: var(--white);
-  transform: scale(1.15);
-}
-
 .product-meta {
   display: flex;
   justify-content: space-between;
@@ -816,10 +807,12 @@ img {
   line-height: 1.35;
   letter-spacing: -0.01em;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .product-title:hover {
   color: var(--ruby-velvet);
+  text-decoration: none !important;
 }
 
 .product-colors-preview {
@@ -878,6 +871,7 @@ img {
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
   border: 1px dashed var(--ruby-velvet);
+  text-decoration: none !important;
 }
 
 .btn-add-cart:hover {
@@ -885,6 +879,7 @@ img {
   color: var(--white);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(125, 37, 58, 0.3);
+  text-decoration: none !important;
 }
 
 .card-qty-selector {
@@ -911,12 +906,14 @@ img {
   justify-content: center;
   transition: var(--transition);
   line-height: 1;
+  text-decoration: none !important;
 }
 
 .qty-btn-card:hover {
   background: var(--white);
   color: var(--ruby-velvet);
   transform: scale(1.12);
+  text-decoration: none !important;
 }
 
 .qty-count-val {
@@ -987,6 +984,7 @@ img {
   border-color: #25D366;
   white-space: nowrap;
   padding: 12px 24px;
+  text-decoration: none !important;
 }
 
 .order-breakdown-box {
@@ -1083,12 +1081,14 @@ img {
   justify-content: center;
   transition: var(--transition);
   box-shadow: 0 4px 14px rgba(125, 37, 58, 0.25);
+  text-decoration: none !important;
 }
 
 .nav-arrow-btn:hover {
   background: var(--ruby-velvet-hover);
   transform: translateY(-2px) scale(1.08);
   box-shadow: 0 8px 20px rgba(125, 37, 58, 0.38);
+  text-decoration: none !important;
 }
 
 /* Feather Gradient Container for Smooth Both-Side Edge Fading */
@@ -1272,10 +1272,12 @@ img {
   font-weight: bold;
   font-size: 0.85rem;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .qty-btn:hover {
   background: var(--sandstone);
+  text-decoration: none !important;
 }
 
 /* Red Trash Can SVG Button */
@@ -1292,12 +1294,14 @@ img {
   align-items: center;
   justify-content: center;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .btn-remove-item:hover {
   background: #C0392B;
   color: var(--white);
   transform: scale(1.1);
+  text-decoration: none !important;
 }
 
 .drawer-footer {
@@ -1367,11 +1371,13 @@ img {
   font-size: 1.2rem;
   color: var(--onyx-black);
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .modal-close:hover {
   background: var(--ruby-velvet);
   color: var(--white);
+  text-decoration: none !important;
 }
 
 /* Form Controls */
@@ -1445,11 +1451,13 @@ textarea.form-control {
   color: var(--text-muted);
   border-bottom: 3px solid transparent;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .admin-tab-btn.active {
   color: var(--ruby-velvet);
   border-bottom-color: var(--ruby-velvet);
+  text-decoration: none !important;
 }
 
 .admin-table {
@@ -1525,6 +1533,7 @@ textarea.form-control {
   justify-content: center;
   color: #E2D9D0;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .social-icon-btn:hover {
@@ -1533,6 +1542,7 @@ textarea.form-control {
   color: var(--white);
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(125, 37, 58, 0.45);
+  text-decoration: none !important;
 }
 
 .footer-col-title {
@@ -1556,11 +1566,13 @@ textarea.form-control {
   color: #B0A69C;
   font-size: 0.9rem;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .footer-menu a:hover {
   color: var(--sandstone);
   padding-left: 4px;
+  text-decoration: none !important;
 }
 
 .footer-bottom-bar {
@@ -1578,11 +1590,12 @@ textarea.form-control {
 .policy-link {
   color: #B0A69C;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .policy-link:hover {
   color: var(--white);
-  text-decoration: underline;
+  text-decoration: underline !important;
 }
 
 /* Authentic Pure Circular WhatsApp Button */
@@ -1601,11 +1614,13 @@ textarea.form-control {
   box-shadow: 0 10px 28px rgba(37, 211, 102, 0.48);
   z-index: 999;
   transition: var(--transition);
+  text-decoration: none !important;
 }
 
 .whatsapp-float-btn:hover {
   transform: translateY(-5px) scale(1.12);
   box-shadow: 0 16px 36px rgba(37, 211, 102, 0.65);
+  text-decoration: none !important;
 }
 
 /* Toast Container Disabled */
@@ -1619,7 +1634,7 @@ textarea.form-control {
 
 @media (max-width: 768px) {
 
-  /* 1. HORIZONTAL SWIPEABLE PRODUCT CATALOG CAROUSEL ON MOBILE (FIXED CARDS ALIGNMENT) */
+  /* 1. HORIZONTAL SWIPEABLE PRODUCT CATALOG CAROUSEL WITH FEATHER EDGES ON MOBILE */
   .products-grid {
     display: flex !important;
     overflow-x: auto !important;
@@ -1631,6 +1646,10 @@ textarea.form-control {
     margin: 0 !important;
     width: 100% !important;
     -webkit-overflow-scrolling: touch !important;
+
+    /* Soft Feather Fade Gradient Mask on Left and Right Edges on Mobile */
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%) !important;
   }
 
   .products-grid::-webkit-scrollbar {
@@ -1650,21 +1669,28 @@ textarea.form-control {
     height: 210px !important;
   }
 
-  /* 2. HORIZONTALLY SCROLLABLE CATEGORY PILLS ON MOBILE */
+  /* 2. CATEGORY PILLS HORIZONTAL SCROLL WITH GENEROUS TOP/LEFT/RIGHT PADDING & FEATHER EDGES */
   .category-pills-bar {
     justify-content: flex-start !important;
-    margin-bottom: 20px !important;
-    padding: 0 16px !important;
+    margin-bottom: 16px !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
 
   .category-pills {
+    display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
-    padding-bottom: 8px !important;
+    /* Generous top, bottom, left & right padding to eliminate ALL clipping on top, left & right! */
+    padding: 14px 20px 16px !important;
     width: 100% !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
     -webkit-overflow-scrolling: touch !important;
+
+    /* Soft Feather Edge Gradient Mask on Mobile Category Pills */
+    mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%) !important;
   }
 
   .category-pills::-webkit-scrollbar {
@@ -1672,9 +1698,15 @@ textarea.form-control {
   }
 
   .pill-btn {
-    padding: 9px 18px !important;
-    font-size: 0.85rem !important;
+    padding: 10px 20px !important;
+    font-size: 0.88rem !important;
     flex-shrink: 0 !important;
+    margin: 0 !important;
+  }
+
+  .pill-btn.active {
+    box-shadow: 0 4px 12px rgba(125, 37, 58, 0.16) !important;
+    transform: scale(1.02) !important;
   }
 
   /* 3. ORDER CONFIRMATION SCREEN MOBILE FIX */
@@ -1835,6 +1867,7 @@ textarea.form-control {
     display: none !important;
   }
 
+  /* Footer Mobile Grid */
   .footer-grid {
     grid-template-columns: 1fr !important;
     gap: 28px !important;
