@@ -558,7 +558,7 @@ window.renderFullPageCheckout = function() {
             <input type="text" id="fullCustAddress" class="form-control" placeholder="Flat No, House Name, Street, Landmark" required />
           </div>
 
-          <!-- Row 4: PIN Code & City (Matching Image Layout) -->
+          <!-- Row 4: PIN Code & City -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
               <label>PIN Code *</label>
@@ -571,7 +571,7 @@ window.renderFullPageCheckout = function() {
             </div>
           </div>
 
-          <!-- Row 5: State Dropdown (Matching Image Layout) -->
+          <!-- Row 5: State Dropdown -->
           <div class="form-group">
             <label>State *</label>
             <select id="fullCustState" class="form-control" required>
@@ -640,7 +640,7 @@ window.renderFullPageCheckout = function() {
   `;
 };
 
-// FULL-PAGE CHECKOUT SUBMIT: INSTANT WHATSAPP REDIRECTION ONLY (NO AUTO MAIL, NO UPI ID)
+// FULL-PAGE CHECKOUT SUBMIT: INSTANT WHATSAPP REDIRECTION ONLY
 window.handleFullPageCheckoutSubmit = function(e) {
   e.preventDefault();
 
@@ -688,36 +688,36 @@ window.renderFullPageOrderSuccess = function(order) {
   });
 
   container.innerHTML = `
-    <div style="max-width: 780px; margin: 0 auto; background: var(--white); border-radius: var(--radius-lg); border: 2px solid var(--sandstone); padding: 48px; box-shadow: var(--shadow-lg); text-align: center;">
-      <div style="font-size: 4rem; margin-bottom: 12px; animation: bounce 1s infinite alternate;">🎉</div>
+    <div class="order-success-card">
+      <div style="font-size: 3.6rem; margin-bottom: 8px; animation: bounce 1s infinite alternate;">🎉</div>
       <div style="display: inline-block; background: var(--ruby-velvet-light); color: var(--ruby-velvet); padding: 6px 18px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 16px;">
         ORDER CONFIRMED #${order.orderId}
       </div>
       
-      <h1 style="font-family: var(--font-heading); font-size: 2.6rem; color: var(--onyx-black); margin-bottom: 10px;">
+      <h1 class="order-success-title">
         Thank You, ${order.customer.name}! 🧶
       </h1>
 
-      <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 24px; max-width: 580px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+      <p class="order-success-subtext">
         WhatsApp has been opened in a new tab! Press <strong>Send</strong> on WhatsApp to share your order details with artisan Priya.
       </p>
 
-      <!-- Instant Re-open WhatsApp Notice Box -->
-      <div style="background: #E8F8F0; border: 1.5px solid #27AE60; border-radius: var(--radius-md); padding: 20px; margin-bottom: 36px; display: flex; align-items: center; justify-content: space-between; gap: 16px; text-align: left;">
-        <div>
-          <h4 style="color: #1E8449; font-size: 1rem; font-weight: 700; margin-bottom: 4px;">💬 WhatsApp Chat Triggered</h4>
-          <p style="font-size: 0.88rem; color: #27AE60; margin: 0;">Order message ready to send to +91 9355415171.</p>
+      <!-- Instant Re-open WhatsApp Notice Box (Fully Mobile Optimized) -->
+      <div class="order-wa-notice-box">
+        <div class="wa-notice-info">
+          <h4>💬 WhatsApp Chat Triggered</h4>
+          <p>Order message ready to send to +91 9355415171.</p>
         </div>
-        <a href="${order.waUrl}" target="_blank" class="btn-primary" style="background: #25D366; border-color: #25D366; white-space: nowrap; padding: 12px 24px;">
+        <a href="${order.waUrl}" target="_blank" class="btn-primary wa-notice-btn">
           Open WhatsApp Now 💬
         </a>
       </div>
 
       <!-- Order Details Card -->
-      <div style="background: var(--porcelain-white); border-radius: var(--radius-md); border: 1px solid var(--sandstone-border); padding: 28px; text-align: left; margin-bottom: 36px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid var(--sandstone-border); padding-bottom: 12px;">
+      <div class="order-breakdown-box">
+        <div class="order-breakdown-header">
           <div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--onyx-black);">Order Breakdown</h3>
+            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--onyx-black); margin-bottom: 2px;">Order Breakdown</h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">${order.orderDate}</span>
           </div>
           <div style="text-align: right;">
@@ -730,7 +730,7 @@ window.renderFullPageOrderSuccess = function(order) {
           ${itemsSummaryHtml}
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid var(--sandstone-border); padding-top: 16px; font-size: 0.88rem;">
+        <div class="order-breakdown-details-grid">
           <div>
             <strong style="color: var(--onyx-black); display: block; margin-bottom: 4px;">Delivery Address:</strong>
             <div style="color: var(--text-muted); line-height: 1.5;">
@@ -753,7 +753,7 @@ window.renderFullPageOrderSuccess = function(order) {
 
       <!-- Action Buttons -->
       <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-        <button class="btn-primary" onclick="showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})" style="padding: 14px 32px; font-size: 1rem;">
+        <button class="btn-primary" onclick="showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})" style="padding: 14px 32px; font-size: 1rem; width: auto;">
           Continue Shopping 🧶
         </button>
       </div>
