@@ -37,9 +37,9 @@
   --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Reset & Smooth Scroll */
+/* Reset & Base Styles */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 * {
@@ -1403,6 +1403,24 @@ body.cart-open {
   align-items: start;
 }
 
+.pdp-trust-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--sandstone-light);
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--sandstone-border);
+}
+
+.desktop-only-trust-box {
+  display: grid !important;
+}
+
+.mobile-only-trust-box {
+  display: none !important;
+}
+
 .detail-color-pill {
   display: inline-flex;
   align-items: center;
@@ -2012,6 +2030,75 @@ textarea.form-control {
   .form-grid-row {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
+  }
+
+  .desktop-only-trust-box {
+    display: none !important;
+  }
+
+  .mobile-only-trust-box {
+    display: grid !important;
+    margin-top: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Compact Product Detail Action Buttons on Mobile (- 1 + & Circular Cart Icon) */
+  .qty-label-desktop,
+  .cart-btn-text-desktop {
+    display: none !important;
+  }
+
+  .pdp-qty-selector {
+    flex: 1 !important;
+    padding: 6px 16px !important;
+    border-radius: var(--radius-full) !important;
+    justify-content: space-between !important;
+    height: 48px !important;
+  }
+
+  .pdp-qty-selector .qty-btn-card {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1.2rem !important;
+  }
+
+  .pdp-qty-selector .qty-count-val {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+  }
+
+  .pdp-cart-btn {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.25rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Product Detail Page Mobile Optimization for Above-the-fold CTA */
+  .product-detail-grid {
+    gap: 18px !important;
+  }
+
+  .product-detail-grid h1 {
+    font-size: 1.55rem !important;
+    line-height: 1.25 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .pdp-main-card {
+    padding: 20px 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .pdp-hero-img {
+    height: 280px !important;
   }
 
   /* 7. TARGETED MOBILE MOTIFS (Exact Image 1 & Image 2 Customizations) */

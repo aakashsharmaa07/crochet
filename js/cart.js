@@ -242,7 +242,7 @@ class CartStore {
           <h4 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--onyx-black); margin-bottom: 8px;">Your Yarn Basket is Empty</h4>
           <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 28px; max-width: 260px;">Explore our handmade crochet collection and pick something cozy!</p>
           
-          <button class="btn-primary" onclick="toggleCartDrawer(false); showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})" style="padding: 14px 32px; font-size: 1rem;">
+          <button class="btn-primary" onclick="toggleCartDrawer(false); scrollToSection('shop');" style="padding: 14px 32px; font-size: 1rem;">
             Explore Collection 🧶
           </button>
         </div>

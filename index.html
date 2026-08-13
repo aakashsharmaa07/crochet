@@ -24,10 +24,10 @@
 
       <!-- Navigation Links -->
       <ul class="nav-links">
-        <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">🧶 Shop Catalog</a></li>
-        <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('bestsellers').scrollIntoView({behavior: 'smooth'})">🔥 Bestsellers</a></li>
-        <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('custom-gifts').scrollIntoView({behavior: 'smooth'})">🎁 Custom Gifts</a></li>
-        <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('story').scrollIntoView({behavior: 'smooth'})">🪡 Our Story</a></li>
+        <li><a href="javascript:void(0)" onclick="scrollToSection('shop')">🧶 Shop Catalog</a></li>
+        <li><a href="javascript:void(0)" onclick="scrollToSection('bestsellers')">🔥 Bestsellers</a></li>
+        <li><a href="javascript:void(0)" onclick="scrollToSection('custom-gifts')">🎁 Custom Gifts</a></li>
+        <li><a href="javascript:void(0)" onclick="scrollToSection('story')">🪡 Our Story</a></li>
       </ul>
 
       <!-- Header Actions: Expandable Search Capsule + Crisp Vector Cart Icon -->
@@ -394,11 +394,11 @@
         <div>
           <div class="footer-col-title">Shop</div>
           <ul class="footer-menu">
-            <li><a href="javascript:void(0)" onclick="showView('shop'); setCategory('Plushies & Amigurumi'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">Amigurumi Plushies</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); setCategory('Bags & Totes'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">Boho Tote Bags</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); setCategory('Home & Coasters'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">Everlasting Flowers</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); setCategory('Wearables & Tops'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">Crochet Bucket Hats</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); setCategory('Accessories & Keychains'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">Cute Keychains</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('shop', 'Plushies & Amigurumi')">Amigurumi Plushies</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('shop', 'Bags & Totes')">Boho Tote Bags</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('shop', 'Home & Coasters')">Everlasting Flowers</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('shop', 'Wearables & Tops')">Crochet Bucket Hats</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('shop', 'Accessories & Keychains')">Cute Keychains</a></li>
           </ul>
         </div>
 
@@ -406,11 +406,11 @@
         <div>
           <div class="footer-col-title">Custom Gifting</div>
           <ul class="footer-menu">
-            <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('story').scrollIntoView({behavior: 'smooth'})">Pick Custom Yarn Colors</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('story').scrollIntoView({behavior: 'smooth'})">Bulk Party Favors</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('story').scrollIntoView({behavior: 'smooth'})">Birthday Gift Packaging</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('story').scrollIntoView({behavior: 'smooth'})">Handwritten Gift Notes</a></li>
-            <li><a href="javascript:void(0)" onclick="showView('shop'); document.getElementById('story').scrollIntoView({behavior: 'smooth'})">Personalized Crochet Tags</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('story')">Pick Custom Yarn Colors</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('story')">Bulk Party Favors</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('story')">Birthday Gift Packaging</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('story')">Handwritten Gift Notes</a></li>
+            <li><a href="javascript:void(0)" onclick="scrollToSection('story')">Personalized Crochet Tags</a></li>
           </ul>
         </div>
       </div>

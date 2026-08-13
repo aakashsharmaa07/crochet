@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.renderApp();
   setupEventListeners();
   checkAdminSecretTrigger();
+  handleUrlHashRoute();
+
+  window.addEventListener('hashchange', () => {
+    handleUrlHashRoute();
+  });
 
   // Outside click handler to collapse expandable header search capsule
   document.addEventListener('click', (e) => {
@@ -29,7 +34,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-window.showView = function(viewName) {
+window.handleUrlHashRoute = function() {
+  const hash = window.location.hash || '';
+  if (hash.includes('product/')) {
+    const productId = hash.split('product/')[1];
+    if (productId && productStore.getProductById(productId)) {
+      openProductDetailPage(productId, false);
+      return;
+    }
+  } else if (hash.includes('checkout')) {
+    if (cartStore.cart.length > 0) {
+      openCheckoutPage(false);
+      return;
+    }
+  } else if (hash.includes('order-success')) {
+    showView('order-success', false, false);
+    return;
+  }
+  showView('shop', false, false);
+};
+
+window.showView = function(viewName, restoreScroll = false, updateHash = true, preserveCurrentScroll = false) {
   currentView = viewName;
 
   const mainShopView = document.getElementById('mainShopView');
@@ -42,7 +67,55 @@ window.showView = function(viewName) {
   if (checkoutView) checkoutView.style.display = viewName === 'checkout' ? 'block' : 'none';
   if (orderSuccessView) orderSuccessView.style.display = viewName === 'order-success' ? 'block' : 'none';
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (updateHash) {
+    if (viewName === 'shop') {
+      try {
+        history.pushState(null, '', window.location.pathname + window.location.search);
+      } catch(e) {
+        window.location.hash = '';
+      }
+    } else if (viewName === 'checkout') {
+      try {
+        history.pushState(null, '', '#checkout');
+      } catch(e) {
+        window.location.hash = 'checkout';
+      }
+    } else if (viewName === 'order-success') {
+      try {
+        history.pushState(null, '', '#order-success');
+      } catch(e) {
+        window.location.hash = 'order-success';
+      }
+    }
+  }
+
+  if (!preserveCurrentScroll) {
+    if (viewName === 'shop' && restoreScroll && lastShopScrollY > 0) {
+      window.scrollTo(0, lastShopScrollY);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }
+};
+
+window.scrollToSection = function(sectionId, categoryName = null) {
+  if (currentView !== 'shop') {
+    showView('shop', false, true, true);
+  }
+  if (categoryName && typeof window.setCategory === 'function') {
+    window.setCategory(categoryName);
+  }
+  const elem = document.getElementById(sectionId);
+  if (elem) {
+    const headerOffset = 80;
+    const elementPosition = elem.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({
+      top: Math.max(0, offsetPosition),
+      behavior: 'smooth'
+    });
+  }
 };
 
 window.renderApp = function() {
@@ -424,15 +497,35 @@ window.addQuickViewToCart = function(productId) {
 // FULL-PAGE DEDICATED PRODUCT DETAILS CONTROLLER
 let currentDetailProductId = null;
 let currentDetailSelectedColor = null;
+let lastShopScrollY = 0;
 
-window.openProductDetailPage = function(productId) {
+window.openProductDetailPage = function(productId, updateHash = true) {
+  if (currentView === 'shop') {
+    lastShopScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+  }
   currentDetailProductId = productId;
   const p = productStore.getProductById(productId);
   if (!p) return;
 
   currentDetailSelectedColor = (p.colors && p.colors.length > 0) ? p.colors[0] : 'Standard';
-  showView('product-detail');
+  showView('product-detail', false, false);
+  if (updateHash) {
+    try {
+      history.pushState(null, '', '#product/' + productId);
+    } catch(e) {
+      window.location.hash = 'product/' + productId;
+    }
+  }
   renderFullPageProductDetail();
+};
+
+window.backToCatalog = function() {
+  try {
+    history.pushState(null, '', window.location.pathname + window.location.search);
+  } catch(e) {
+    window.location.hash = '';
+  }
+  showView('shop', true, false);
 };
 
 window.renderFullPageProductDetail = function() {
@@ -471,7 +564,7 @@ window.renderFullPageProductDetail = function() {
   container.innerHTML = `
     <!-- Top Breadcrumb & Navigation -->
     <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-      <button class="btn-back-premium" onclick="showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">
+      <button class="btn-back-premium" onclick="backToCatalog()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
@@ -479,25 +572,25 @@ window.renderFullPageProductDetail = function() {
         <span>Back to Catalog</span>
       </button>
       <div style="font-size: 0.88rem; color: var(--text-muted);">
-        <a href="javascript:void(0)" onclick="showView('shop')" style="color: var(--ruby-velvet); font-weight: 600;">Home</a> / 
+        <a href="javascript:void(0)" onclick="backToCatalog()" style="color: var(--ruby-velvet); font-weight: 600;">Home</a> / 
         <span>${p.category}</span> / 
         <strong style="color: var(--onyx-black);">${p.name}</strong>
       </div>
     </div>
 
     <!-- Main Product Detail Card (2-Column Grid) -->
-    <div style="background: var(--white); border-radius: var(--radius-lg); border: 1.5px dashed var(--sandstone-border); padding: 36px; box-shadow: var(--shadow-md); margin-bottom: 48px;">
+    <div class="pdp-main-card" style="background: var(--white); border-radius: var(--radius-lg); border: 1.5px dashed var(--sandstone-border); padding: 36px; box-shadow: var(--shadow-md); margin-bottom: 48px;">
       <div class="product-detail-grid">
         
-        <!-- LEFT COLUMN: Product Gallery & Badges -->
+        <!-- LEFT COLUMN: Product Gallery Image & Desktop Trust Box -->
         <div>
           <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; border: 2px dashed var(--ruby-velvet); box-shadow: var(--shadow-sm); background: var(--porcelain-white); margin-bottom: 20px;">
-            <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 420px; object-fit: cover; transition: transform 0.5s ease;" />
+            <img src="${p.image}" alt="${p.name}" class="pdp-hero-img" style="width: 100%; height: 420px; object-fit: cover; transition: transform 0.5s ease;" />
             ${p.badge ? `<span class="card-badge" style="top: 16px; left: 16px; font-size: 0.85rem; padding: 6px 18px;">${p.badge}</span>` : ''}
           </div>
 
-          <!-- Trust Feature Badges Box -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--sandstone-light); padding: 18px; border-radius: var(--radius-md); border: 1px dashed var(--sandstone-border);">
+          <!-- Trust Feature Badges Box (Desktop Only - Fills Left Column) -->
+          <div class="pdp-trust-box desktop-only-trust-box">
             <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
               <span style="font-size: 1.2rem; color: var(--ruby-velvet);">🧶</span> 100% Cotton Yarn
             </div>
@@ -513,7 +606,7 @@ window.renderFullPageProductDetail = function() {
           </div>
         </div>
 
-        <!-- RIGHT COLUMN: Details, Color Selection & Actions -->
+        <!-- RIGHT COLUMN: Details, Color Selection, Actions, Badges & Accordions -->
         <div style="display: flex; flex-direction: column;">
           
           <div style="font-size: 0.82rem; font-weight: 700; color: var(--ruby-velvet); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">
@@ -560,8 +653,24 @@ window.renderFullPageProductDetail = function() {
             <!-- Rendered via updateDetailActionUI -->
           </div>
 
+          <!-- Trust Feature Badges Box (Mobile Only - Positioned Directly Above Accordions) -->
+          <div class="pdp-trust-box mobile-only-trust-box">
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">🧶</span> 100% Cotton Yarn
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">✨</span> 100% Handcrafted
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">📦</span> Safe India Express
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">🧼</span> Washable & Durable
+            </div>
+          </div>
+
           <!-- Accordion Feature Details -->
-          <div style="margin-top: 24px; border-top: 1px dashed var(--sandstone-border); padding-top: 20px;">
+          <div style="margin-top: 8px; border-top: 1px dashed var(--sandstone-border); padding-top: 20px;">
             <details class="pdp-accordion-details" open>
               <summary class="pdp-accordion-summary">
                 <span>✨ Yarn Quality & Specifications</span>
@@ -631,13 +740,15 @@ window.updateDetailActionUI = function() {
   if (colorQty > 0) {
     actionBox.innerHTML = `
       <div style="display: flex; gap: 14px; align-items: center;">
-        <div class="card-qty-selector" style="flex: 1; justify-content: space-around; padding: 12px 20px; font-size: 1.1rem;">
+        <div class="card-qty-selector pdp-qty-selector" style="flex: 1; justify-content: space-around; padding: 12px 20px; font-size: 1.1rem;">
           <button class="qty-btn-card" style="width: 34px; height: 34px; font-size: 1.2rem;" onclick="cartStore.updateItemQuantityByColor('${currentDetailProductId}', '${currentDetailSelectedColor}', -1)" title="Decrease">-</button>
-          <span class="qty-count-val" style="font-size: 1.15rem;">${colorQty} in Basket</span>
+          <span class="qty-count-val" style="font-size: 1.15rem;">
+            <span>${colorQty}</span><span class="qty-label-desktop"> in Basket</span>
+          </span>
           <button class="qty-btn-card" style="width: 34px; height: 34px; font-size: 1.2rem;" onclick="cartStore.updateItemQuantityByColor('${currentDetailProductId}', '${currentDetailSelectedColor}', 1)" title="Increase">+</button>
         </div>
-        <button class="btn-primary" style="padding: 14px 28px; font-size: 1rem;" onclick="toggleCartDrawer(true)">
-          View Basket 🛒
+        <button class="btn-primary pdp-cart-btn" style="padding: 14px 28px; font-size: 1rem;" onclick="toggleCartDrawer(true)" title="View Basket">
+          <span class="cart-btn-text-desktop">View Basket </span>🛒
         </button>
       </div>
     `;
@@ -737,12 +848,12 @@ window.handlePincodeInput = function(val) {
 };
 
 // FULL-PAGE CHECKOUT FLOW
-window.openCheckoutPage = function() {
+window.openCheckoutPage = function(updateHash = true) {
   if (cartStore.cart.length === 0) {
     return;
   }
   toggleCartDrawer(false);
-  showView('checkout');
+  showView('checkout', false, updateHash);
   renderFullPageCheckout();
 };
 
@@ -756,7 +867,7 @@ window.renderFullPageCheckout = function() {
         <div style="font-size: 4rem; margin-bottom: 16px;">🧶</div>
         <h3 style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--onyx-black); margin-bottom: 8px;">Your Yarn Basket is Empty</h3>
         <p style="color: var(--text-muted); margin-bottom: 24px;">Add some handmade crochet items to your cart before proceeding to checkout!</p>
-        <button class="btn-primary" onclick="showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">
+        <button class="btn-primary" onclick="showView('shop')">
           Explore Collection 🧶
         </button>
       </div>
