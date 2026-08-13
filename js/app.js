@@ -33,10 +33,12 @@ window.showView = function(viewName) {
   currentView = viewName;
 
   const mainShopView = document.getElementById('mainShopView');
+  const productDetailView = document.getElementById('productDetailView');
   const checkoutView = document.getElementById('checkoutView');
   const orderSuccessView = document.getElementById('orderSuccessView');
 
   if (mainShopView) mainShopView.style.display = viewName === 'shop' ? 'block' : 'none';
+  if (productDetailView) productDetailView.style.display = viewName === 'product-detail' ? 'block' : 'none';
   if (checkoutView) checkoutView.style.display = viewName === 'checkout' ? 'block' : 'none';
   if (orderSuccessView) orderSuccessView.style.display = viewName === 'order-success' ? 'block' : 'none';
 
@@ -291,15 +293,14 @@ function createProductCardHtml(p, prefix = '') {
 
   return `
     <div class="product-card" id="product-card-${prefix}${p.id}">
-      <div class="card-img-wrapper" onclick="openQuickView('${p.id}')" style="cursor: pointer;">
+      <div class="card-img-wrapper" onclick="openProductDetailPage('${p.id}')" style="cursor: pointer;">
         <img src="${p.image}" alt="${p.name}" class="card-img" />
         ${p.badge ? `<span class="card-badge">${p.badge}</span>` : ''}
       </div>
       <div class="product-meta">
         <span>${p.category}</span>
-        <span class="crafting-tag">🧶 ${p.craftingDays || 'Made to order'}</span>
       </div>
-      <h3 class="product-title" onclick="openQuickView('${p.id}')" style="cursor: pointer;">${p.name}</h3>
+      <h3 class="product-title" onclick="openProductDetailPage('${p.id}')" style="cursor: pointer;">${p.name}</h3>
       
       <div class="product-colors-preview">
         <span style="font-size: 0.75rem; color: var(--text-muted); margin-right: 4px;">Colors:</span>
@@ -360,11 +361,7 @@ window.openQuickView = function(productId) {
         <div style="font-size: 0.8rem; color: var(--ruby-velvet); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">${p.category}</div>
         <h2 style="font-family: var(--font-heading); font-size: 1.8rem; margin-bottom: 8px;">${p.name}</h2>
         <div style="font-size: 1.4rem; font-weight: 700; color: var(--ruby-velvet); margin-bottom: 12px;">₹${p.price} <span style="font-size: 0.9rem; color: var(--text-muted); text-decoration: line-through;">₹${p.originalPrice || ''}</span></div>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">${p.description}</p>
-        
-        <div style="background: var(--sandstone-light); padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 16px;">
-          <strong>🧶 Handcrafting Lead Time:</strong> ${p.craftingDays || 'Ships in 3-5 days'}
-        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">${p.description}</p>
 
         <div class="form-group">
           <label>Select Custom Yarn Color:</label>
@@ -422,6 +419,254 @@ window.addQuickViewToCart = function(productId) {
     cartStore.addToCart(p, chosenColor, 1);
     updateQuickViewActionUI(productId);
   }
+};
+
+// FULL-PAGE DEDICATED PRODUCT DETAILS CONTROLLER
+let currentDetailProductId = null;
+let currentDetailSelectedColor = null;
+
+window.openProductDetailPage = function(productId) {
+  currentDetailProductId = productId;
+  const p = productStore.getProductById(productId);
+  if (!p) return;
+
+  currentDetailSelectedColor = (p.colors && p.colors.length > 0) ? p.colors[0] : 'Standard';
+  showView('product-detail');
+  renderFullPageProductDetail();
+};
+
+window.renderFullPageProductDetail = function() {
+  const container = document.getElementById('fullPageProductDetailContainer');
+  if (!container || !currentDetailProductId) return;
+
+  const p = productStore.getProductById(currentDetailProductId);
+  if (!p) return;
+
+  const colors = p.colors || ['Standard'];
+  if (!currentDetailSelectedColor) {
+    currentDetailSelectedColor = colors[0];
+  }
+
+  // Recommended Products from Catalog
+  const recommended = productStore.getAllProducts()
+    .filter(item => item.id !== p.id)
+    .slice(0, 3);
+  
+  const recommendedCardsHtml = recommended.map(rec => createProductCardHtml(rec, 'pdp-rec-')).join('');
+
+  // Interactive Color Swatches HTML
+  const colorPillsHtml = colors.map(c => {
+    const isActive = c === currentDetailSelectedColor;
+    const hex = getColorHex(c);
+    return `
+      <button class="detail-color-pill ${isActive ? 'active' : ''}" onclick="updateDetailColorSelection('${c}')">
+        <span class="color-dot" style="background: ${hex}; width: 18px; height: 18px;"></span>
+        <span>${c}</span>
+      </button>
+    `;
+  }).join('');
+
+  const discountPercent = p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0;
+
+  container.innerHTML = `
+    <!-- Top Breadcrumb & Navigation -->
+    <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <button class="btn-back-premium" onclick="showView('shop'); document.getElementById('shop').scrollIntoView({behavior: 'smooth'})">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Catalog</span>
+      </button>
+      <div style="font-size: 0.88rem; color: var(--text-muted);">
+        <a href="javascript:void(0)" onclick="showView('shop')" style="color: var(--ruby-velvet); font-weight: 600;">Home</a> / 
+        <span>${p.category}</span> / 
+        <strong style="color: var(--onyx-black);">${p.name}</strong>
+      </div>
+    </div>
+
+    <!-- Main Product Detail Card (2-Column Grid) -->
+    <div style="background: var(--white); border-radius: var(--radius-lg); border: 1.5px dashed var(--sandstone-border); padding: 36px; box-shadow: var(--shadow-md); margin-bottom: 48px;">
+      <div class="product-detail-grid">
+        
+        <!-- LEFT COLUMN: Product Gallery & Badges -->
+        <div>
+          <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; border: 2px dashed var(--ruby-velvet); box-shadow: var(--shadow-sm); background: var(--porcelain-white); margin-bottom: 20px;">
+            <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 420px; object-fit: cover; transition: transform 0.5s ease;" />
+            ${p.badge ? `<span class="card-badge" style="top: 16px; left: 16px; font-size: 0.85rem; padding: 6px 18px;">${p.badge}</span>` : ''}
+          </div>
+
+          <!-- Trust Feature Badges Box -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--sandstone-light); padding: 18px; border-radius: var(--radius-md); border: 1px dashed var(--sandstone-border);">
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">🧶</span> 100% Cotton Yarn
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">✨</span> 100% Handcrafted
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">📦</span> Safe India Express
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--onyx-black);">
+              <span style="font-size: 1.2rem; color: var(--ruby-velvet);">🧼</span> Washable & Durable
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Details, Color Selection & Actions -->
+        <div style="display: flex; flex-direction: column;">
+          
+          <div style="font-size: 0.82rem; font-weight: 700; color: var(--ruby-velvet); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">
+            ${p.category}
+          </div>
+
+          <h1 style="font-family: var(--font-heading); font-size: 2.5rem; line-height: 1.2; color: var(--onyx-black); margin-bottom: 12px; font-weight: 700;">
+            ${p.name}
+          </h1>
+
+          <!-- Reviews rating badge -->
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 0.9rem;">
+            <span style="color: #E6A100;">★★★★★</span>
+            <span style="font-weight: 700; color: var(--onyx-black);">4.9</span>
+            <span style="color: var(--text-muted);">(48 Verified Handcrafted Reviews)</span>
+          </div>
+
+          <!-- Price Row -->
+          <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px;">
+            <span style="font-size: 2.1rem; font-weight: 800; color: var(--ruby-velvet);">₹${p.price}</span>
+            ${p.originalPrice ? `
+              <span style="font-size: 1.1rem; color: var(--text-muted); text-decoration: line-through;">₹${p.originalPrice}</span>
+              <span style="background: #E8F8F0; color: #1E8449; font-size: 0.82rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); border: 1px solid #27AE60;">Save ${discountPercent}%</span>
+            ` : ''}
+          </div>
+
+          <!-- Description -->
+          <p style="font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+            ${p.description}
+          </p>
+
+          <!-- Interactive Color Selector -->
+          <div style="margin-bottom: 28px;">
+            <label style="display: block; font-weight: 700; font-size: 0.95rem; color: var(--onyx-black); margin-bottom: 10px;">
+              Select Custom Yarn Color: <span id="detailSelectedColorName" style="color: var(--ruby-velvet); font-weight: 600;">${currentDetailSelectedColor}</span>
+            </label>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              ${colorPillsHtml}
+            </div>
+          </div>
+
+          <!-- Dynamic Action & Quantity Bar -->
+          <div id="detailActionBox" style="margin-bottom: 24px;">
+            <!-- Rendered via updateDetailActionUI -->
+          </div>
+
+          <!-- Accordion Feature Details -->
+          <div style="margin-top: 24px; border-top: 1px dashed var(--sandstone-border); padding-top: 20px;">
+            <details class="pdp-accordion-details" open>
+              <summary class="pdp-accordion-summary">
+                <span>✨ Yarn Quality & Specifications</span>
+                <span class="pdp-accordion-icon">🧶</span>
+              </summary>
+              <div class="pdp-accordion-content">
+                Crocheted stitch-by-stitch using 100% hypoallergenic cotton yarn. Soft to touch, durable, and crafted to retain its plush shape forever.
+              </div>
+            </details>
+            <details class="pdp-accordion-details">
+              <summary class="pdp-accordion-summary">
+                <span>🎁 Eco Packaging & Gifting</span>
+                <span class="pdp-accordion-icon">🧶</span>
+              </summary>
+              <div class="pdp-accordion-content">
+                Every item is packed in rustic eco-friendly kraft packaging tied with a yarn bow for your loved ones.
+              </div>
+            </details>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Products Section -->
+    <div style="margin-top: 48px;">
+      <div style="text-align: center; margin-bottom: 28px;">
+        <span class="section-tag">Handcrafted Favorites</span>
+        <h2 style="font-family: var(--font-heading); font-size: 2rem; color: var(--onyx-black);">You May Also Love 🌸</h2>
+      </div>
+      <div class="products-grid">
+        ${recommendedCardsHtml}
+      </div>
+    </div>
+  `;
+
+  updateDetailActionUI();
+};
+
+window.updateDetailColorSelection = function(color) {
+  currentDetailSelectedColor = color;
+  const label = document.getElementById('detailSelectedColorName');
+  if (label) label.textContent = color;
+
+  const container = document.getElementById('fullPageProductDetailContainer');
+  if (container) {
+    const pills = container.querySelectorAll('.detail-color-pill');
+    pills.forEach(pill => {
+      const text = pill.querySelector('span:last-child').textContent;
+      if (text === color) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+  }
+
+  updateDetailActionUI();
+};
+
+window.updateDetailActionUI = function() {
+  const actionBox = document.getElementById('detailActionBox');
+  if (!actionBox || !currentDetailProductId || !currentDetailSelectedColor) return;
+
+  const colorQty = cartStore.getItemQuantityByColor(currentDetailProductId, currentDetailSelectedColor);
+
+  if (colorQty > 0) {
+    actionBox.innerHTML = `
+      <div style="display: flex; gap: 14px; align-items: center;">
+        <div class="card-qty-selector" style="flex: 1; justify-content: space-around; padding: 12px 20px; font-size: 1.1rem;">
+          <button class="qty-btn-card" style="width: 34px; height: 34px; font-size: 1.2rem;" onclick="cartStore.updateItemQuantityByColor('${currentDetailProductId}', '${currentDetailSelectedColor}', -1)" title="Decrease">-</button>
+          <span class="qty-count-val" style="font-size: 1.15rem;">${colorQty} in Basket</span>
+          <button class="qty-btn-card" style="width: 34px; height: 34px; font-size: 1.2rem;" onclick="cartStore.updateItemQuantityByColor('${currentDetailProductId}', '${currentDetailSelectedColor}', 1)" title="Increase">+</button>
+        </div>
+        <button class="btn-primary" style="padding: 14px 28px; font-size: 1rem;" onclick="toggleCartDrawer(true)">
+          View Basket 🛒
+        </button>
+      </div>
+    `;
+  } else {
+    actionBox.innerHTML = `
+      <button class="btn-primary" style="width: 100%; justify-content: center; padding: 15px 32px; font-size: 1.05rem;" onclick="addCurrentDetailToCart()">
+        Add to Cart 🛒
+      </button>
+    `;
+  }
+};
+
+window.addCurrentDetailToCart = function() {
+  if (!currentDetailProductId || !currentDetailSelectedColor) return;
+  const p = productStore.getProductById(currentDetailProductId);
+  if (p) {
+    cartStore.addToCart(p, currentDetailSelectedColor, 1);
+    updateDetailActionUI();
+  }
+};
+
+window.orderProductViaWhatsApp = function(productId) {
+  const p = productStore.getProductById(productId);
+  if (!p) return;
+  const color = currentDetailSelectedColor || 'Standard';
+  const settings = cartStore.getSettings();
+  const text = `Hi Priya! I want to order the handcrafted *${p.name}* (Color: ${color}) for ₹${p.price}. Please confirm my order! 🧶`;
+  const url = `https://wa.me/${settings.whatsappPhone || '919355415171'}?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
 };
 
 window.toggleCartDrawer = function(open = true) {

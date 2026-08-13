@@ -65,6 +65,9 @@ class CartStore {
   saveCart() {
     localStorage.setItem(this.cartKey, JSON.stringify(this.cart));
     this.updateCartBadge();
+    if (window.updateDetailActionUI) {
+      window.updateDetailActionUI();
+    }
   }
 
   loadWishlist() {
