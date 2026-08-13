@@ -349,7 +349,6 @@ window.openQuickView = function(productId) {
   if (!overlay || !card) return;
 
   const colorOptions = (p.colors || ['Standard']).map(c => `<option value="${c}">${c}</option>`).join('');
-  const inCartQty = cartStore.getProductTotalQuantity(p.id);
 
   card.innerHTML = `
     <button class="modal-close" onclick="closeQuickView()">&times;</button>
@@ -369,27 +368,44 @@ window.openQuickView = function(productId) {
 
         <div class="form-group">
           <label>Select Custom Yarn Color:</label>
-          <select id="quickViewColorSelect" class="form-control">
+          <select id="quickViewColorSelect" class="form-control" onchange="updateQuickViewActionUI('${p.id}')">
             ${colorOptions}
           </select>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 20px; align-items: center;">
-          ${inCartQty > 0 ? `
-            <div class="card-qty-selector" style="flex: 1; justify-content: space-around; padding: 6px 14px;">
-              <button class="qty-btn-card" onclick="cartStore.updateCardItemQuantity('${p.id}', -1)">-</button>
-              <span class="qty-count-val" style="font-size: 1.1rem;">${inCartQty} in Basket</span>
-              <button class="qty-btn-card" onclick="cartStore.updateCardItemQuantity('${p.id}', 1)">+</button>
-            </div>
-          ` : `
-            <button class="btn-primary" style="flex: 1; justify-content: center;" onclick="addQuickViewToCart('${p.id}')">Add to Cart 🛒</button>
-          `}
+        <div id="quickViewActionContainer-${p.id}" style="display: flex; gap: 12px; margin-top: 20px; align-items: center;">
+          <!-- Rendered via updateQuickViewActionUI -->
         </div>
       </div>
     </div>
   `;
 
   overlay.classList.add('active');
+  updateQuickViewActionUI(p.id);
+};
+
+window.updateQuickViewActionUI = function(productId) {
+  const container = document.getElementById('quickViewActionContainer-' + productId);
+  if (!container) return;
+
+  const colorSelect = document.getElementById('quickViewColorSelect');
+  const p = productStore.getProductById(productId);
+  const selectedColor = colorSelect ? colorSelect.value : (p && p.colors ? p.colors[0] : 'Standard');
+  const colorQty = cartStore.getItemQuantityByColor(productId, selectedColor);
+
+  if (colorQty > 0) {
+    container.innerHTML = `
+      <div class="card-qty-selector" style="flex: 1; justify-content: space-around; padding: 8px 16px;">
+        <button class="qty-btn-card" onclick="cartStore.updateItemQuantityByColor('${productId}', '${selectedColor}', -1)" title="Decrease Quantity">-</button>
+        <span class="qty-count-val" style="font-size: 1.1rem;">${colorQty} in Basket</span>
+        <button class="qty-btn-card" onclick="cartStore.updateItemQuantityByColor('${productId}', '${selectedColor}', 1)" title="Increase Quantity">+</button>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <button class="btn-primary" style="flex: 1; justify-content: center; padding: 13px 24px;" onclick="addQuickViewToCart('${productId}')">Add to Cart 🛒</button>
+    `;
+  }
 };
 
 window.closeQuickView = function() {
@@ -404,7 +420,7 @@ window.addQuickViewToCart = function(productId) {
 
   if (p) {
     cartStore.addToCart(p, chosenColor, 1);
-    openQuickView(productId);
+    updateQuickViewActionUI(productId);
   }
 };
 
@@ -535,18 +551,18 @@ window.renderFullPageCheckout = function() {
           <!-- Row 1: Full Name -->
           <div class="form-group">
             <label>Your Full Name *</label>
-            <input type="text" id="fullCustName" class="form-control" placeholder="e.g. Aakash Sharma" value="Aakash Sharma" required />
+            <input type="text" id="fullCustName" class="form-control" placeholder="Enter your full name" required />
           </div>
 
           <!-- Row 2: Phone & Email -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-grid-row">
             <div class="form-group">
               <label>WhatsApp Number *</label>
-              <input type="tel" id="fullCustPhone" class="form-control" placeholder="9355415171" value="9355415171" required />
+              <input type="tel" id="fullCustPhone" class="form-control" placeholder="10-digit mobile number" required />
             </div>
             <div class="form-group">
               <label>Email Address *</label>
-              <input type="email" id="fullCustEmail" class="form-control" placeholder="aakashs.studentbca24@dspsr.in" value="aakashs.studentbca24@dspsr.in" required />
+              <input type="email" id="fullCustEmail" class="form-control" placeholder="name@example.com" required />
             </div>
           </div>
 
@@ -557,7 +573,7 @@ window.renderFullPageCheckout = function() {
           </div>
 
           <!-- Row 4: PIN Code & City -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-grid-row">
             <div class="form-group">
               <label>PIN Code *</label>
               <input type="text" id="fullCustPincode" class="form-control" placeholder="6-digit PIN" maxlength="6" oninput="handlePincodeInput(this.value)" required />

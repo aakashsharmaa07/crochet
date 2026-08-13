@@ -107,6 +107,39 @@ class CartStore {
     if (window.updateCardQuantityUI) {
       window.updateCardQuantityUI(product.id);
     }
+    if (window.updateQuickViewActionUI) {
+      window.updateQuickViewActionUI(product.id);
+    }
+  }
+
+  getItemQuantityByColor(productId, color) {
+    const targetColor = color || 'Standard';
+    const item = this.cart.find(i => i.id === productId && i.selectedColor === targetColor);
+    return item ? item.quantity : 0;
+  }
+
+  updateItemQuantityByColor(productId, color, delta) {
+    const targetColor = color || 'Standard';
+    const index = this.cart.findIndex(i => i.id === productId && i.selectedColor === targetColor);
+
+    if (index > -1) {
+      this.cart[index].quantity += delta;
+      if (this.cart[index].quantity <= 0) {
+        this.cart.splice(index, 1);
+      }
+    } else if (delta > 0) {
+      const product = window.productStore.getProductById(productId);
+      if (product) this.addToCart(product, targetColor, 1);
+      return;
+    }
+
+    this.saveCart();
+    if (window.updateCardQuantityUI) {
+      window.updateCardQuantityUI(productId);
+    }
+    if (window.updateQuickViewActionUI) {
+      window.updateQuickViewActionUI(productId);
+    }
   }
 
   updateCardItemQuantity(productId, delta) {
@@ -131,6 +164,9 @@ class CartStore {
     this.saveCart();
     if (window.updateCardQuantityUI) {
       window.updateCardQuantityUI(productId);
+    }
+    if (window.updateQuickViewActionUI) {
+      window.updateQuickViewActionUI(productId);
     }
   }
 

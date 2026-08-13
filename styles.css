@@ -1396,6 +1396,13 @@ body.cart-open {
 }
 
 /* Form Controls */
+.form-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
 .form-group {
   margin-bottom: 16px;
 }
@@ -1870,6 +1877,11 @@ textarea.form-control {
   #fullPageCheckoutContainer > div {
     grid-template-columns: 1fr !important;
     gap: 24px !important;
+  }
+
+  .form-grid-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
   /* 7. TARGETED MOBILE MOTIFS (Exact Image 1 & Image 2 Customizations) */
