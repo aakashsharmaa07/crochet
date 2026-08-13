@@ -142,6 +142,39 @@ class ProductStore {
     products = products.filter(p => p.id !== id);
     this.saveProducts(products);
   }
+
+  getCategories() {
+    const defaultCategories = [
+      'Plushies & Amigurumi',
+      'Bags & Totes',
+      'Home & Coasters',
+      'Wearables & Tops',
+      'Accessories & Keychains'
+    ];
+    try {
+      const stored = JSON.parse(localStorage.getItem('cozy_store_categories'));
+      return stored && Array.isArray(stored) && stored.length > 0 ? stored : defaultCategories;
+    } catch (e) {
+      return defaultCategories;
+    }
+  }
+
+  addCategory(categoryName) {
+    const categories = this.getCategories();
+    const cleanName = categoryName.trim();
+    if (cleanName && !categories.includes(cleanName)) {
+      categories.push(cleanName);
+      localStorage.setItem('cozy_store_categories', JSON.stringify(categories));
+      return true;
+    }
+    return false;
+  }
+
+  deleteCategory(categoryName) {
+    let categories = this.getCategories();
+    categories = categories.filter(c => c !== categoryName);
+    localStorage.setItem('cozy_store_categories', JSON.stringify(categories));
+  }
 }
 
 window.productStore = new ProductStore();

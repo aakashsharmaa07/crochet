@@ -14,6 +14,15 @@ class CartStore {
     this.initDefaultSettings();
   }
 
+  showToast(message) {
+    const toast = document.getElementById('toast');
+    if (toast) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  }
+
   initDefaultSettings() {
     const defaultSettings = {
       storeName: 'Cozy Loops Crochet',
@@ -294,9 +303,17 @@ class CartStore {
       orderId: orderId,
       date: orderDate,
       customer: customerData,
+      customerName: customerData.name,
+      phone: customerData.phone,
+      email: customerData.email,
+      address: customerData.address,
+      city: customerData.city,
+      state: customerData.state,
+      pincode: customerData.pincode,
       items: [...this.cart],
       totalAmount: subtotal,
-      status: 'Pending Order Confirmation',
+      total: subtotal,
+      status: 'Pending',
       notes: customerData.notes || ''
     };
 
@@ -343,6 +360,62 @@ Hi Priya! Please confirm my handcrafted order! 🧶`;
     this.clearCart();
 
     return completedOrderData;
+  }
+
+  getOrders() {
+    try {
+      const orders = JSON.parse(localStorage.getItem(this.ordersKey)) || [];
+      return orders.map(o => {
+        const customer = o.customer || {};
+        return {
+          orderId: o.orderId || 'ORD-000',
+          date: o.date || o.orderDate || new Date().toLocaleDateString(),
+          customerName: customer.name || o.customerName || 'Guest Customer',
+          phone: customer.phone || o.phone || '',
+          email: customer.email || o.email || '',
+          address: customer.address || o.address || '',
+          city: customer.city || o.city || '',
+          state: customer.state || o.state || '',
+          pincode: customer.pincode || o.pincode || '',
+          items: o.items || [],
+          total: o.totalAmount !== undefined ? o.totalAmount : (o.total || 0),
+          status: o.status || 'Pending',
+          notes: o.notes || ''
+        };
+      });
+    } catch(e) {
+      console.error('Error loading orders', e);
+      return [];
+    }
+  }
+
+  updateOrderStatus(orderId, newStatus) {
+    try {
+      const orders = JSON.parse(localStorage.getItem(this.ordersKey)) || [];
+      const updated = orders.map(o => {
+        if (o.orderId === orderId) {
+          return { ...o, status: newStatus };
+        }
+        return o;
+      });
+      localStorage.setItem(this.ordersKey, JSON.stringify(updated));
+      return true;
+    } catch(e) {
+      console.error('Error updating order status', e);
+      return false;
+    }
+  }
+
+  deleteOrder(orderId) {
+    try {
+      const orders = JSON.parse(localStorage.getItem(this.ordersKey)) || [];
+      const updated = orders.filter(o => o.orderId !== orderId);
+      localStorage.setItem(this.ordersKey, JSON.stringify(updated));
+      return true;
+    } catch(e) {
+      console.error('Error deleting order', e);
+      return false;
+    }
   }
 }
 

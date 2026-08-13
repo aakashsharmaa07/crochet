@@ -36,6 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.handleUrlHashRoute = function() {
   const hash = window.location.hash || '';
+  if (hash.includes('admin')) {
+    window.location.href = 'admin.html';
+    return;
+  }
   if (hash.includes('product/')) {
     const productId = hash.split('product/')[1];
     if (productId && productStore.getProductById(productId)) {
@@ -61,11 +65,13 @@ window.showView = function(viewName, restoreScroll = false, updateHash = true, p
   const productDetailView = document.getElementById('productDetailView');
   const checkoutView = document.getElementById('checkoutView');
   const orderSuccessView = document.getElementById('orderSuccessView');
+  const adminView = document.getElementById('adminView');
 
   if (mainShopView) mainShopView.style.display = viewName === 'shop' ? 'block' : 'none';
   if (productDetailView) productDetailView.style.display = viewName === 'product-detail' ? 'block' : 'none';
   if (checkoutView) checkoutView.style.display = viewName === 'checkout' ? 'block' : 'none';
   if (orderSuccessView) orderSuccessView.style.display = viewName === 'order-success' ? 'block' : 'none';
+  if (adminView) adminView.style.display = viewName === 'admin' ? 'block' : 'none';
 
   if (updateHash) {
     if (viewName === 'shop') {
@@ -73,6 +79,12 @@ window.showView = function(viewName, restoreScroll = false, updateHash = true, p
         history.pushState(null, '', window.location.pathname + window.location.search);
       } catch(e) {
         window.location.hash = '';
+      }
+    } else if (viewName === 'admin') {
+      try {
+        history.pushState(null, '', '#admin');
+      } catch(e) {
+        window.location.hash = 'admin';
       }
     } else if (viewName === 'checkout') {
       try {
@@ -130,13 +142,13 @@ window.renderApp = function() {
 function checkAdminSecretTrigger() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('admin') === 'true') {
-    adminDashboard.renderAdminView();
+    window.location.href = 'admin.html';
   }
 
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
       e.preventDefault();
-      adminDashboard.renderAdminView();
+      window.location.href = 'admin.html';
     }
   });
 }
