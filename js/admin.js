@@ -22,9 +22,19 @@ class AdminDashboard {
   }
 
   getAdminCredentials() {
+    let email = localStorage.getItem('cozy_admin_email');
+    let password = localStorage.getItem('cozy_admin_password');
+    if (!email || !email.trim()) {
+      email = 'admin@cozyloops.com';
+      localStorage.setItem('cozy_admin_email', email);
+    }
+    if (!password || !password.trim()) {
+      password = 'admin123';
+      localStorage.setItem('cozy_admin_password', password);
+    }
     return {
-      email: localStorage.getItem('cozy_admin_email') || 'admin@cozyloops.com',
-      password: localStorage.getItem('cozy_admin_password') || 'admin123'
+      email: email.trim(),
+      password: password.trim()
     };
   }
 
@@ -46,7 +56,7 @@ class AdminDashboard {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
 
-    const isEmailValid = cleanEmail === creds.email.toLowerCase() || cleanEmail === 'admin';
+    const isEmailValid = cleanEmail === creds.email.toLowerCase();
     const isPasswordValid = cleanPass === creds.password;
 
     if (isEmailValid && isPasswordValid) {
@@ -271,6 +281,9 @@ class AdminDashboard {
             <button type="button" class="btn-secondary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.88rem;" onclick="window.location.href='index.html'">
               ← Return to Live Store
             </button>
+
+            
+            </div>
           </div>
 
         </div>
