@@ -2452,39 +2452,42 @@ textarea.form-control {
   .desktop-only-trust-box {
     display: none !important;
   }
+}
 
-  /* Toast Notification Overlay - Compact & Centered */
-  .toast-notification {
-    position: fixed !important;
-    bottom: 24px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) translateY(16px) !important;
-    background: rgba(30, 26, 23, 0.95) !important;
-    color: var(--white) !important;
-    padding: 10px 20px !important;
-    border-radius: 9999px !important;
-    font-size: 0.82rem !important;
-    font-weight: 600 !important;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    backdrop-filter: blur(8px) !important;
-    z-index: 999999 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    text-align: center !important;
-    max-width: calc(100vw - 32px) !important;
-    width: max-content !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
+/* Global Toast Notification Overlay - Compact & Centered (Desktop & Mobile) */
+.toast-notification {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) translateY(16px) !important;
+  background: rgba(30, 26, 23, 0.95) !important;
+  color: #FFFFFF !important;
+  padding: 10px 22px !important;
+  border-radius: 9999px !important;
+  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 999999 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  text-align: center !important;
+  max-width: calc(100vw - 32px) !important;
+  width: max-content !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
 
-  .toast-notification.show {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transform: translateX(-50%) translateY(0) !important;
-  }
+.toast-notification.show {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+@media (max-width: 768px) {
 
   .mobile-only-trust-box {
     display: grid !important;
