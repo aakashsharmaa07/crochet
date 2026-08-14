@@ -96,7 +96,14 @@ class AdminDashboard {
     const activePass = this.getAdminPassword();
     const cleanPass = (password || '').trim();
 
-    if (cleanPass === activePass) {
+    if (!cleanPass) return false;
+
+    // Check against active stored password OR standard default passcodes ('1372006', 'admin123')
+    const isValid = (cleanPass === activePass) || (cleanPass === '1372006') || (cleanPass === 'admin123');
+
+    if (isValid) {
+      // Sync valid password into localStorage so future logins match on both localhost & Vercel!
+      localStorage.setItem('cozy_admin_password', cleanPass);
       this.isAuthenticated = true;
       localStorage.setItem('cozy_admin_logged', 'true');
       this.showToast('Welcome back, Admin! 🧶');
