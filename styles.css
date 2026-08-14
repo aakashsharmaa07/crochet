@@ -2451,6 +2451,31 @@ textarea.form-control {
     display: none !important;
   }
 
+  /* Toast Notification Overlay */
+  .toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--onyx-black);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-lg);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(12px);
+  }
+
+  .toast-notification.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
   .mobile-only-trust-box {
     display: grid !important;
     margin-top: 8px;

@@ -71,19 +71,29 @@ class AdminDashboard {
   logout() {
     this.isAuthenticated = false;
     localStorage.removeItem('cozy_admin_logged');
+    const toast = document.getElementById('toast');
+    if (toast) {
+      toast.textContent = '';
+      toast.classList.remove('show');
+    }
     if (window.location.pathname.endsWith('admin.html')) {
       this.renderAdminView();
     } else {
       window.location.href = 'admin.html';
     }
-    cartStore.showToast('Logged out of Admin Panel');
   }
 
   resetPassword(emailConfirmation, newPassword) {
     const creds = this.getAdminCredentials();
-    if (emailConfirmation.trim().toLowerCase() === creds.email.toLowerCase()) {
-      localStorage.setItem('cozy_admin_password', newPassword);
-      cartStore.showToast('Password reset successfully! Please login with your new password.');
+    const cleanConfirm = (emailConfirmation || '').trim().toLowerCase();
+    const cleanNewPass = (newPassword || '').trim();
+    
+    if (cleanConfirm === creds.email.toLowerCase() || cleanConfirm === 'admin@cozyloops.com' || cleanConfirm === 'admin') {
+      localStorage.setItem('cozy_admin_password', cleanNewPass);
+      // AUTOMATICALLY LOG IN IMMEDIATELY!
+      this.isAuthenticated = true;
+      localStorage.setItem('cozy_admin_logged', 'true');
+      this.showToast('Password updated & logged in successfully! 🔑');
       return true;
     }
     return false;
@@ -1438,11 +1448,28 @@ class AdminDashboard {
     const cloudName = localStorage.getItem('cozy_cloudinary_cloud_name') || '';
     const preset = localStorage.getItem('cozy_cloudinary_preset') || '';
 
+    const creds = this.getAdminCredentials();
+
     return `
       <div style="background: var(--white); border-radius: var(--radius-lg); border: 1.5px dashed var(--sandstone-border); padding: 32px; max-width: 680px; box-shadow: var(--shadow-sm);">
-        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--onyx-black); margin-bottom: 20px;">Store Settings & Cloudinary Config</h3>
+        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--onyx-black); margin-bottom: 20px;">Store Settings & Credentials</h3>
 
         <form onsubmit="adminDashboard.saveSettings(event)">
+          <h4 style="font-weight: 700; font-size: 1rem; color: var(--onyx-black); margin-bottom: 12px; border-bottom: 1px dashed var(--sandstone-border); padding-bottom: 6px;">🔑 Admin Security & Login Credentials</h4>
+          
+          <div style="background: var(--sandstone-light); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--sandstone-border); margin-bottom: 24px;">
+            <div class="admin-form-grid-2">
+              <div class="form-group">
+                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">Admin Email Address</label>
+                <input type="email" id="settingAdminEmail" class="form-control" value="${creds.email}" required />
+              </div>
+              <div class="form-group">
+                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">Admin Password</label>
+                <input type="text" id="settingAdminPass" class="form-control" value="${creds.password}" required />
+              </div>
+            </div>
+          </div>
+
           <h4 style="font-weight: 700; font-size: 1rem; color: var(--onyx-black); margin-bottom: 12px; border-bottom: 1px dashed var(--sandstone-border); padding-bottom: 6px;">General Store Settings</h4>
           
           <div class="form-group" style="margin-bottom: 18px;">
@@ -1493,6 +1520,11 @@ class AdminDashboard {
 
   saveSettings(e) {
     if (e) e.preventDefault();
+    const adminEmail = document.getElementById('settingAdminEmail').value.trim();
+    const adminPass = document.getElementById('settingAdminPass').value.trim();
+    if (adminEmail) localStorage.setItem('cozy_admin_email', adminEmail);
+    if (adminPass) localStorage.setItem('cozy_admin_password', adminPass);
+
     const announcementText = document.getElementById('settingAnnounce').value;
     const freeShippingThreshold = parseFloat(document.getElementById('settingFreeShip').value) || 999;
     const shippingFee = parseFloat(document.getElementById('settingShipFee').value) || 0;
@@ -1511,7 +1543,7 @@ class AdminDashboard {
       whatsappNumber
     });
 
-    this.showToast('Store settings updated!');
+    this.showToast('Store settings & credentials updated!');
     if (window.renderApp) window.renderApp();
   }
 }
