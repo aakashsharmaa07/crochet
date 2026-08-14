@@ -11,6 +11,7 @@ class AdminDashboard {
     this.currentTab = hash || storedTab || 'dashboard';
     
     this.searchQuery = '';
+    this.isMobileMenuOpen = false;
     
     // Initialize default credentials if not set
     if (!localStorage.getItem('cozy_admin_email')) {
@@ -21,45 +22,81 @@ class AdminDashboard {
     }
   }
 
-  getAdminCredentials() {
-    let email = localStorage.getItem('cozy_admin_email');
-    let password = localStorage.getItem('cozy_admin_password');
-    if (!email || !email.trim()) {
-      email = 'admin@cozyloops.com';
-      localStorage.setItem('cozy_admin_email', email);
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    const sidebar = document.querySelector('.admin-sidebar-warm');
+    const backdrop = document.getElementById('adminMobileBackdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    const sidebar = document.querySelector('.admin-sidebar-warm');
+    const backdrop = document.getElementById('adminMobileBackdrop');
+    if (sidebar) {
+      if (this.isMobileMenuOpen) {
+        sidebar.classList.add('mobile-open');
+      } else {
+        sidebar.classList.remove('mobile-open');
+      }
     }
+    if (backdrop) {
+      if (this.isMobileMenuOpen) {
+        backdrop.classList.add('active');
+      } else {
+        backdrop.classList.remove('active');
+      }
+    }
+  }
+
+  switchTab(tabName) {
+    this.currentTab = tabName;
+    this.isMobileMenuOpen = false;
+    const sidebar = document.querySelector('.admin-sidebar-warm');
+    const backdrop = document.getElementById('adminMobileBackdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+
+    localStorage.setItem('cozy_admin_active_tab', tabName);
+    try {
+      window.location.hash = tabName;
+    } catch(e) {}
+    this.renderAdminView();
+  }
+
+  getAdminPassword() {
+    let password = localStorage.getItem('cozy_admin_password');
     if (!password || !password.trim()) {
-      password = 'admin123';
+      password = '1372006';
       localStorage.setItem('cozy_admin_password', password);
     }
-    return {
-      email: email.trim(),
-      password: password.trim()
-    };
+    return password.trim();
   }
 
   showToast(message) {
-    if (window.cartStore && typeof window.cartStore.showToast === 'function') {
-      window.cartStore.showToast(message);
-      return;
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      toast.className = 'toast-notification';
+      document.body.appendChild(toast);
     }
-    const toast = document.getElementById('toast');
-    if (toast) {
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
+    toast.textContent = message;
+    toast.removeAttribute('style');
+    toast.classList.add('show');
+
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
   }
 
-  login(email, password) {
-    const creds = this.getAdminCredentials();
-    const cleanEmail = (email || '').trim().toLowerCase();
+  login(password) {
+    const activePass = this.getAdminPassword();
     const cleanPass = (password || '').trim();
 
-    const isEmailValid = cleanEmail === creds.email.toLowerCase();
-    const isPasswordValid = cleanPass === creds.password;
-
-    if (isEmailValid && isPasswordValid) {
+    if (cleanPass === activePass) {
       this.isAuthenticated = true;
       localStorage.setItem('cozy_admin_logged', 'true');
       this.showToast('Welcome back, Admin! 🧶');
@@ -81,22 +118,6 @@ class AdminDashboard {
     } else {
       window.location.href = 'admin.html';
     }
-  }
-
-  resetPassword(emailConfirmation, newPassword) {
-    const creds = this.getAdminCredentials();
-    const cleanConfirm = (emailConfirmation || '').trim().toLowerCase();
-    const cleanNewPass = (newPassword || '').trim();
-    
-    if (cleanConfirm === creds.email.toLowerCase() || cleanConfirm === 'admin@cozyloops.com' || cleanConfirm === 'admin') {
-      localStorage.setItem('cozy_admin_password', cleanNewPass);
-      // AUTOMATICALLY LOG IN IMMEDIATELY!
-      this.isAuthenticated = true;
-      localStorage.setItem('cozy_admin_logged', 'true');
-      this.showToast('Password updated & logged in successfully! 🔑');
-      return true;
-    }
-    return false;
   }
 
   renderAdminView() {
@@ -125,11 +146,23 @@ class AdminDashboard {
       container.innerHTML = `
         <div class="admin-fullpage-layout">
           
-          <!-- LEFT SIDEBAR: Cozy Loops Warm Branding & Navigation -->
-          <aside class="admin-sidebar-warm">
+          <!-- MOBILE BACKDROP OVERLAY -->
+          <div id="adminMobileBackdrop" class="admin-mobile-backdrop ${this.isMobileMenuOpen ? 'active' : ''}" onclick="adminDashboard.toggleMobileMenu()"></div>
+
+          <!-- MOBILE STICKY TOP HEADER BAR -->
+          <div class="admin-mobile-header-bar" style="display: none;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button class="admin-hamburger-btn" onclick="adminDashboard.toggleMobileMenu()" aria-label="Toggle Menu">
+                ☰
+              </button>
+              <span style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; color: var(--onyx-black);">Cozy Loops</span>
+            </div>
+          </div>
+
+          <!-- LEFT SIDEBAR: SLIDE-OVER DRAWER FROM LEFT ON MOBILE -->
+          <aside class="admin-sidebar-warm ${this.isMobileMenuOpen ? 'mobile-open' : ''}">
             <div>
-              <!-- Brand Logo Header -->
-              <div class="admin-sidebar-brand">
+              <div class="admin-sidebar-brand" style="display: flex; align-items: center; gap: 10px;">
                 <div class="admin-brand-icon">🧶</div>
                 <div>
                   <div class="admin-brand-title">Cozy Loops</div>
@@ -137,36 +170,36 @@ class AdminDashboard {
                 </div>
               </div>
 
-              <!-- MAIN NAVIGATION -->
-              <div class="admin-nav-section-title">Main</div>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'dashboard' ? 'active' : ''}" onclick="adminDashboard.switchTab('dashboard')">
-                <span>📊 Dashboard</span>
-              </a>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'orders' ? 'active' : ''}" onclick="adminDashboard.switchTab('orders')">
-                <span>🛍️ Orders</span>
-                ${pendingOrdersCount > 0 ? `<span class="admin-nav-badge">${pendingOrdersCount}</span>` : ''}
-              </a>
+              <!-- SIDEBAR NAV DRAWER -->
+              <div id="adminSidebarNav" class="admin-sidebar-nav">
+                <div class="admin-nav-section-title">Main</div>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'dashboard' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('dashboard');">
+                  <span>📊 Dashboard</span>
+                </a>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'orders' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('orders');">
+                  <span>🛍️ Orders</span>
+                  ${pendingOrdersCount > 0 ? `<span class="admin-nav-badge">${pendingOrdersCount}</span>` : ''}
+                </a>
 
-              <!-- CATALOGUE NAVIGATION -->
-              <div class="admin-nav-section-title">Catalogue</div>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'products' ? 'active' : ''}" onclick="adminDashboard.switchTab('products')">
-                <span>📦 Products & Pricing</span>
-              </a>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'categories' ? 'active' : ''}" onclick="adminDashboard.switchTab('categories')">
-                <span>🏷️ Store Categories</span>
-              </a>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'inventory' ? 'active' : ''}" onclick="adminDashboard.switchTab('inventory')">
-                <span>📊 Inventory & Stock</span>
-              </a>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'gallery' ? 'active' : ''}" onclick="adminDashboard.switchTab('gallery')">
-                <span>🖼️ Product Gallery</span>
-              </a>
+                <div class="admin-nav-section-title">Catalogue</div>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'products' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('products');">
+                  <span>📦 Products & Pricing</span>
+                </a>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'categories' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('categories');">
+                  <span>🏷️ Store Categories</span>
+                </a>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'inventory' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('inventory');">
+                  <span>📊 Inventory & Stock</span>
+                </a>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'gallery' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('gallery');">
+                  <span>🖼️ Product Gallery</span>
+                </a>
 
-              <!-- SETTINGS NAVIGATION -->
-              <div class="admin-nav-section-title">Settings</div>
-              <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'settings' ? 'active' : ''}" onclick="adminDashboard.switchTab('settings')">
-                <span>⚙️ Store Settings</span>
-              </a>
+                <div class="admin-nav-section-title">Settings</div>
+                <a href="javascript:void(0)" class="admin-nav-item ${this.currentTab === 'settings' ? 'active' : ''}" onclick="adminDashboard.closeMobileMenu(); adminDashboard.switchTab('settings');">
+                  <span>⚙️ Store Settings</span>
+                </a>
+              </div>
             </div>
 
             <!-- BOTTOM ADMIN USER CARD -->
@@ -175,7 +208,7 @@ class AdminDashboard {
                 <div class="admin-avatar">A</div>
                 <div style="overflow: hidden;">
                   <div style="font-weight: 700; font-size: 0.88rem; color: var(--onyx-black); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Aakash Sharma</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${this.getAdminCredentials().email}</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">admin@cozyloops.com</div>
                 </div>
               </div>
               <button class="btn-secondary" style="width: 100%; padding: 8px; font-size: 0.8rem; justify-content: center;" onclick="adminDashboard.logout()">
@@ -256,45 +289,34 @@ class AdminDashboard {
   renderLoginPage(container) {
     container.innerHTML = `
       <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--porcelain-white); padding: 20px;">
-        <div style="background: var(--white); border-radius: var(--radius-lg); border: 1.5px dashed var(--sandstone-border); padding: 40px; width: 100%; max-width: 440px; box-shadow: var(--shadow-md); text-align: center;">
+        <div style="background: var(--white); border-radius: 24px; border: 1.5px solid var(--sandstone-border); padding: 44px 40px; width: 100%; max-width: 440px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06); text-align: center; animation: adminScaleUp 0.35s ease;">
           
-          <div style="width: 64px; height: 64px; background: var(--sandstone-light); border: 2px dashed var(--ruby-velvet); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px auto;">
+          <div style="width: 60px; height: 60px; background: var(--sandstone-light); border: 2px dashed var(--ruby-velvet); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 16px auto;">
             🧶
           </div>
 
-          <h2 style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--onyx-black); margin-bottom: 6px;">Cozy Loops Admin</h2>
-          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">Sign in with your email & password to manage store orders and catalog</p>
+          <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--onyx-black); margin-bottom: 4px;">Admin Portal</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-bottom: 28px;">Cozy Loops Crochet • Internal</p>
 
-          <!-- INLINE ERROR WARNING BANNER -->
-          <div id="adminLoginError" style="display: none; background: #FDEDEC; border: 1.5px dashed #F5C6CB; color: #C0392B; font-size: 0.85rem; font-weight: 600; padding: 12px 14px; border-radius: var(--radius-md); margin-bottom: 20px; text-align: left; box-shadow: var(--shadow-sm);">
-            ⚠️ Incorrect email or password. Please check your credentials and try again.
-          </div>
-
-          <div class="admin-login-form">
-            <div class="form-group" style="text-align: left; margin-bottom: 18px;">
-              <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">Admin Email Address</label>
-              <input type="email" id="adminEmailInput" class="form-control" placeholder="Enter admin email address" required onkeydown="if(event.key==='Enter') adminDashboard.handleLoginSubmit(event)" />
-            </div>
-
-            <div class="form-group" style="text-align: left; margin-bottom: 22px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black);">Password</label>
-                <a href="javascript:void(0)" onclick="adminDashboard.renderForgotPasswordModal()" style="font-size: 0.8rem; color: var(--ruby-velvet); font-weight: 600;">Forgot Password?</a>
+          <form onsubmit="adminDashboard.handleLoginSubmit(event)">
+            <div style="text-align: left; margin-bottom: 24px;">
+              <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 8px;">Admin Password</label>
+              <input type="password" id="adminPasswordInput" class="form-control" style="height: 48px; border-radius: 12px; background: #FBF9F6; border: 1.5px solid var(--sandstone-border); padding: 0 16px; font-size: 0.95rem; width: 100%;" placeholder="Enter password" required autofocus />
+              
+              <!-- INLINE ERROR MESSAGE EXACTLY AS SCREENSHOT 2 -->
+              <div id="adminLoginError" style="display: none; color: #E74C3C; font-size: 0.82rem; font-weight: 600; margin-top: 8px;">
+                Incorrect password. Please try again.
               </div>
-              <input type="password" id="adminPasswordInput" class="form-control" placeholder="Enter your password" onkeydown="if(event.key==='Enter') adminDashboard.handleLoginSubmit(event)" />
             </div>
 
-            <button type="button" onclick="adminDashboard.handleLoginSubmit(event)" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; margin-bottom: 16px;">
-              Sign In to Dashboard 🔑
+            <button type="submit" class="btn-primary" style="width: 100%; height: 50px; border-radius: 9999px; justify-content: center; font-size: 1rem; font-weight: 700; gap: 8px; margin-bottom: 12px;">
+              Sign In →
             </button>
 
-            <button type="button" class="btn-secondary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.88rem;" onclick="window.location.href='index.html'">
+            <button type="button" class="btn-secondary" style="width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-muted);" onclick="window.location.href='index.html'">
               ← Return to Live Store
             </button>
-
-            
-            </div>
-          </div>
+          </form>
 
         </div>
       </div>
@@ -307,26 +329,20 @@ class AdminDashboard {
       try { e.stopPropagation(); } catch(err) {}
     }
 
-    const emailElem = document.getElementById('adminEmailInput');
     const passElem = document.getElementById('adminPasswordInput');
     const errorElem = document.getElementById('adminLoginError');
 
-    const email = emailElem ? emailElem.value : '';
     const pass = passElem ? passElem.value : '';
 
-    if (this.login(email, pass)) {
+    if (this.login(pass)) {
       if (errorElem) errorElem.style.display = 'none';
       this.renderAdminView();
     } else {
-      if (errorElem) {
-        errorElem.style.display = 'block';
-        errorElem.innerHTML = `⚠️ Incorrect email or password. Please check your credentials and try again.`;
-      }
+      if (errorElem) errorElem.style.display = 'block';
       if (passElem) {
-        passElem.style.borderColor = '#C0392B';
+        passElem.style.borderColor = '#E74C3C';
         passElem.focus();
       }
-      this.showToast('Incorrect email or password.');
     }
     return false;
   }
@@ -1253,7 +1269,7 @@ class AdminDashboard {
             </span>
           </td>
           <td>
-            <div style="display: flex; align-items: center; gap: 24px;">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: nowrap; min-width: 260px;">
               <!-- IN STOCK SWITCH TOGGLE -->
               <label class="admin-switch-label" title="Toggle In Stock / Out of Stock">
                 <span class="admin-switch">
@@ -1448,24 +1464,23 @@ class AdminDashboard {
     const cloudName = localStorage.getItem('cozy_cloudinary_cloud_name') || '';
     const preset = localStorage.getItem('cozy_cloudinary_preset') || '';
 
-    const creds = this.getAdminCredentials();
-
     return `
       <div style="background: var(--white); border-radius: var(--radius-lg); border: 1.5px dashed var(--sandstone-border); padding: 32px; max-width: 680px; box-shadow: var(--shadow-sm);">
-        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--onyx-black); margin-bottom: 20px;">Store Settings & Credentials</h3>
+        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--onyx-black); margin-bottom: 20px;">Store Settings & Security</h3>
 
         <form onsubmit="adminDashboard.saveSettings(event)">
-          <h4 style="font-weight: 700; font-size: 1rem; color: var(--onyx-black); margin-bottom: 12px; border-bottom: 1px dashed var(--sandstone-border); padding-bottom: 6px;">🔑 Admin Security & Login Credentials</h4>
+          <h4 style="font-weight: 700; font-size: 1rem; color: var(--onyx-black); margin-bottom: 12px; border-bottom: 1px dashed var(--sandstone-border); padding-bottom: 6px;">🔒 Change Admin Passcode</h4>
           
           <div style="background: var(--sandstone-light); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--sandstone-border); margin-bottom: 24px;">
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Leave fields blank if you do not wish to change your admin passcode.</p>
             <div class="admin-form-grid-2">
               <div class="form-group">
-                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">Admin Email Address</label>
-                <input type="email" id="settingAdminEmail" class="form-control" value="${creds.email}" required />
+                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">New Passcode</label>
+                <input type="password" id="settingNewPasscode" class="form-control" placeholder="Enter new passcode..." />
               </div>
               <div class="form-group">
-                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">Admin Password</label>
-                <input type="text" id="settingAdminPass" class="form-control" value="${creds.password}" required />
+                <label style="font-weight: 700; font-size: 0.85rem; color: var(--onyx-black); display: block; margin-bottom: 6px;">Confirm Passcode</label>
+                <input type="password" id="settingConfirmPasscode" class="form-control" placeholder="Confirm new passcode..." />
               </div>
             </div>
           </div>
@@ -1520,10 +1535,17 @@ class AdminDashboard {
 
   saveSettings(e) {
     if (e) e.preventDefault();
-    const adminEmail = document.getElementById('settingAdminEmail').value.trim();
-    const adminPass = document.getElementById('settingAdminPass').value.trim();
-    if (adminEmail) localStorage.setItem('cozy_admin_email', adminEmail);
-    if (adminPass) localStorage.setItem('cozy_admin_password', adminPass);
+    const newPass = document.getElementById('settingNewPasscode').value.trim();
+    const confirmPass = document.getElementById('settingConfirmPasscode').value.trim();
+
+    if (newPass) {
+      if (newPass === confirmPass) {
+        localStorage.setItem('cozy_admin_password', newPass);
+      } else {
+        this.showToast('New passcodes do not match!');
+        return;
+      }
+    }
 
     const announcementText = document.getElementById('settingAnnounce').value;
     const freeShippingThreshold = parseFloat(document.getElementById('settingFreeShip').value) || 999;
@@ -1543,7 +1565,7 @@ class AdminDashboard {
       whatsappNumber
     });
 
-    this.showToast('Store settings & credentials updated!');
+    this.showToast(newPass ? 'Store settings & passcode updated!' : 'Store settings updated!');
     if (window.renderApp) window.renderApp();
   }
 }
